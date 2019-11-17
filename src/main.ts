@@ -1,19 +1,15 @@
-import * as core from '@actions/core';
-import {wait} from './wait'
+import * as core from '@actions/core'
+import { analyse, Issue } from './analyse'
 
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    console.log(`Waiting ${ms} milliseconds ...`)
-
-    core.debug((new Date()).toTimeString())
-    await wait(parseInt(ms, 10));
-    core.debug((new Date()).toTimeString())
-
-    core.setOutput('time', new Date().toTimeString());
+    const issues: Issue[] = await analyse('path to directory with elm.json')
+    core.debug(issues.toString())
+    // core.setOutput('time', new Date().toTimeString())
   } catch (error) {
-    core.setFailed(error.message);
+    // core.setFailed(error.message)
+    core.setFailed(error)
   }
 }
 
-run();
+run()
