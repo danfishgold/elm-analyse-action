@@ -41,7 +41,11 @@ function runAnalyser(
   })
 }
 
-export async function analyse(directory: string): Promise<Issue[]> {
+export async function analyse(
+  workspaceDirectory: string,
+  elmRootDirectory: string,
+): Promise<Issue[]> {
+  const directory = path.join(workspaceDirectory, elmRootDirectory)
   const elmJsonPath = path.join(directory, 'elm.json')
   const project = await readFile(elmJsonPath, {
     encoding: 'utf-8',

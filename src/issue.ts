@@ -54,7 +54,3 @@ export function issueFromMessage(message: Message): Issue {
     range,
   }
 }
-
-export function issueToCheckAnnotation(
-  issue: Issue,
-): GitHub.ChecksUpdateParamsOutputAnnotations {}

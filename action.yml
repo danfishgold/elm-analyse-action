@@ -1,11 +1,14 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'elm-analyse'
+description: 'Run elm-analyse on your codebase'
+author: 'danfishgold'
 inputs:
-  elmRootDirectory:
+  elm_root_directory:
     description: 'The directory where elm.json is.'
     required: false
     default: '.'
+  repo_token:
+    description: 'The GitGub token for this repository.'
+    required: true
 runs:
   using: 'node12'
   main: 'lib/main.js'

@@ -2,9 +2,9 @@ import { GitHub } from '@actions/github'
 import { Issue } from './issue'
 import * as path from 'path'
 
-const { GITHUB_SHA, GITHUB_EVENT_PATH, GITHUB_TOKEN } = process.env
+const { GITHUB_SHA, GITHUB_EVENT_PATH, INPUT_REPO_TOKEN } = process.env
 
-const github = new GitHub(GITHUB_TOKEN || '')
+const github = new GitHub(INPUT_REPO_TOKEN || '')
 
 const event = require(GITHUB_EVENT_PATH || '')
 const repository = event.repository
@@ -13,7 +13,7 @@ const repo = repository.name
 // const pull_number = event.number
 
 export async function createCheckRun(
-  directory: string,
+  elmRootDirectory: string,
   issuesPromise: Promise<Issue[]>,
 ) {
   const checkRun = await github.checks.create({
@@ -26,7 +26,7 @@ export async function createCheckRun(
   })
 
   const annotations = (await issuesPromise).map(issue =>
-    annotationFromIssue(directory, issue),
+    annotationFromIssue(elmRootDirectory, issue),
   )
   const conclusion = 'success'
   const output = {
@@ -90,11 +90,14 @@ function range(
   }
 }
 
-function annotationFromIssue(directory: string, issue: Issue): Annotation {
+function annotationFromIssue(
+  elmRootDirectory: string,
+  issue: Issue,
+): Annotation {
   return {
     annotation_level: 'notice',
     message: `message for ${issue.description}`,
-    path: path.join(directory, issue.file),
+    path: path.join(elmRootDirectory, issue.file),
     raw_details: `raw details for ${issue.description}`,
     title: `title for ${issue.description}`,
     ...range(issue),

@@ -1,5 +1,6 @@
 # comment out in distribution branches
 node_modules/
+lib/
 
 # dotenv environment variables file
 .env
@@ -7,3 +8,6 @@ node_modules/
 
 # debug .map files
 *.js.map
+
+# test elm stuff
+elm-stuff
