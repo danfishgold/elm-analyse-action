@@ -1,9 +1,9 @@
-import { ElmApp, Config, Message, Report } from 'elm-analyse/ts/domain'
+import { ElmApp, Config, Report } from 'elm-analyse/ts/domain'
 import * as fileLoadingPorts from 'elm-analyse/dist/app/file-loading-ports'
 import * as loggingPorts from 'elm-analyse/dist/app/util/logging-ports'
 import * as dependencies from 'elm-analyse/dist/app/util/dependencies'
 import { Elm } from 'elm-analyse/dist/app/backend-elm'
-
+import { Issue, issueFromMessage } from './issue'
 import * as path from 'path'
 import * as fs from 'fs'
 import util from 'util'
@@ -39,38 +39,6 @@ function runAnalyser(
       fileLoadingPorts.setup(app, config, directory.replace(/[\\/]?$/, ''))
     })
   })
-}
-
-export interface Issue {
-  file: string
-  type: string
-  description: string
-  lineRange: {
-    start: number
-    end: number
-  }
-}
-
-function issueFromMessage(message: Message): Issue {
-  const [
-    startRow,
-    startColumn,
-    endRow,
-    endColumn,
-  ] = message.data.properties.range
-  const ending = new RegExp(
-    ` [Aa]t \\(\\(${startRow},${startColumn}\\),\\(${endRow},${endColumn}\\)\\)$`,
-  )
-  const cleanerDescription = message.data.description.replace(ending, '')
-  return {
-    file: message.file,
-    type: message.type,
-    description: cleanerDescription,
-    lineRange: {
-      start: startRow,
-      end: endRow,
-    },
-  }
 }
 
 export async function analyse(directory: string): Promise<Issue[]> {

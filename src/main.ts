@@ -1,12 +1,14 @@
 import * as core from '@actions/core'
-import { analyse, Issue } from './analyse'
+import { analyse } from './analyse'
+import { createCheckRun } from './checks'
 
 async function run() {
   try {
-    const issues: Issue[] = await analyse('path to directory with elm.json')
-    core.debug(JSON.stringify(issues))
+    const elmRootDirectory = process.env.INPUT_ELM_ROOT_DIRECTORY || ''
+    const issuesPromise = analyse(elmRootDirectory)
+    await createCheckRun(elmRootDirectory, issuesPromise)
   } catch (error) {
-    core.setFailed(error)
+    core.setFailed(error.message)
   }
 }
 
