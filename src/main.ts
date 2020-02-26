@@ -1,13 +1,30 @@
 import * as core from '@actions/core'
-import { analyse } from './analyse'
-import { createCheckRun } from './checks'
+import actionInputs from './inputs'
+import analyse from './analyse'
+import CheckRun from './checks'
+import analysisAnnotations from './analysis-annotations'
 
 async function run() {
   try {
-    const workspaceDirectory = process.env.GITHUB_WORKSPACE || ''
-    const elmRootDirectory = process.env.INPUT_ELM_ROOT_DIRECTORY || ''
-    const issuesPromise = analyse(workspaceDirectory, elmRootDirectory)
-    await createCheckRun(elmRootDirectory, issuesPromise)
+    const {
+      workspaceDirectory,
+      elmRootDirectory,
+      headSha,
+      repoOwner,
+      repoName,
+      github,
+    } = actionInputs(process.env)
+
+    const checkRun = await CheckRun.start(
+      github,
+      repoOwner,
+      repoName,
+      headSha,
+      elmRootDirectory,
+    )
+    const report = await analyse(workspaceDirectory, elmRootDirectory)
+    const annotations = analysisAnnotations(report, elmRootDirectory)
+    await checkRun.finish(annotations)
   } catch (error) {
     core.setFailed(error.message)
   }

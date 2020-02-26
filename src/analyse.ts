@@ -3,11 +3,30 @@ import * as fileLoadingPorts from 'elm-analyse/dist/app/file-loading-ports'
 import * as loggingPorts from 'elm-analyse/dist/app/util/logging-ports'
 import * as dependencies from 'elm-analyse/dist/app/util/dependencies'
 import { Elm } from 'elm-analyse/dist/app/backend-elm'
-import { Issue, issueFromMessage } from './issue'
 import * as path from 'path'
 import * as fs from 'fs'
 import util from 'util'
 const readFile = util.promisify(fs.readFile)
+
+export default async function analyse(
+  workspaceDirectory: string,
+  elmRootDirectory: string,
+): Promise<Report> {
+  const directory = path.resolve(workspaceDirectory, elmRootDirectory)
+  const elmJsonPath = path.resolve(directory, 'elm.json')
+  const project = await readFile(elmJsonPath, {
+    encoding: 'utf-8',
+  }).then(JSON.parse)
+
+  const config = {
+    port: 0,
+    elmFormatPath: 'elm-format',
+    format: 'json',
+    open: false,
+  }
+
+  return await runAnalyser(directory, config, project)
+}
 
 /// This is pretty much the start method from elm-analyse/ts/analyser.ts but
 /// without the hardcoded reporter, because it console.logs the result,
@@ -39,25 +58,4 @@ function runAnalyser(
       fileLoadingPorts.setup(app, config, directory.replace(/[\\/]?$/, ''))
     })
   })
-}
-
-export async function analyse(
-  workspaceDirectory: string,
-  elmRootDirectory: string,
-): Promise<Issue[]> {
-  const directory = path.join(workspaceDirectory, elmRootDirectory)
-  const elmJsonPath = path.join(directory, 'elm.json')
-  const project = await readFile(elmJsonPath, {
-    encoding: 'utf-8',
-  }).then(JSON.parse)
-
-  const config = {
-    port: 0,
-    elmFormatPath: 'elm-format',
-    format: 'json',
-    open: false,
-  }
-
-  const report = await runAnalyser(directory, config, project)
-  return report.messages.map(issueFromMessage)
 }
