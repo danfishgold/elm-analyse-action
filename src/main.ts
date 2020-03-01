@@ -22,9 +22,14 @@ async function run() {
       headSha,
       elmRootDirectory,
     )
-    const report = await analyse(workspaceDirectory, elmRootDirectory)
-    const annotations = analysisAnnotations(report, elmRootDirectory)
-    await checkRun.finish(annotations)
+    try {
+      const report = await analyse(workspaceDirectory, elmRootDirectory)
+      const annotations = analysisAnnotations(report, elmRootDirectory)
+      await checkRun.finish(annotations)
+    } catch (error) {
+      await checkRun.fail()
+      throw error
+    }
   } catch (error) {
     core.setFailed(error.message)
   }

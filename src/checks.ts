@@ -84,6 +84,15 @@ export default class CheckRun {
     })
   }
 
+  async fail() {
+    await this.github.checks.update({
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: this.checkRunId,
+      conclusion: 'failure',
+    })
+  }
+
   checkSummary(annotationCount: number): string {
     if (annotationCount == 0) {
       return 'No issues found'
