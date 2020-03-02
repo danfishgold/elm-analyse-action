@@ -69,8 +69,8 @@ export default class CheckRun {
   async finish(annotations: Annotation[]) {
     const output = {
       annotations,
-      title: '`elm-analyse` report',
       summary: this.checkSummary(annotations.length),
+      title: 'elm-analyse report',
     }
     const conclusion = annotations.length == 0 ? 'success' : 'failure'
     await this.github.checks.update({

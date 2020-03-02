@@ -21,7 +21,7 @@ function annotationForUnusedDependency(
 ): Annotation {
   return {
     annotation_level: 'warning',
-    message: `Unused dependency: \`${dependency}\``,
+    message: `Unused dependency: ${dependency}`,
     path: path.join(elmRootDirectory, 'elm.json'),
     start_line: 0,
     end_line: 0,
