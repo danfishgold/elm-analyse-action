@@ -66,11 +66,25 @@ export default class CheckRun {
     )
   }
 
-  async finish(annotations: Annotation[]) {
+  async updateWithAnnotations(annotations: Annotation[], summary: string) {
     const output = {
       annotations,
-      summary: this.checkSummary(annotations.length),
       title: 'elm-analyse report',
+      summary,
+    }
+    await this.github.checks.update({
+      owner: this.owner,
+      repo: this.repo,
+      check_run_id: this.checkRunId,
+      status: 'in_progress',
+      output,
+    })
+  }
+
+  async finish(annotations: Annotation[]) {
+    const summary = this.checkSummary(annotations.length)
+    for (let annotationChunk of chunk(annotations, 50)) {
+      await this.updateWithAnnotations(annotationChunk, summary)
     }
     const conclusion = annotations.length == 0 ? 'success' : 'failure'
     await this.github.checks.update({
@@ -79,7 +93,6 @@ export default class CheckRun {
       check_run_id: this.checkRunId,
       status: 'completed',
       conclusion,
-      output,
       completed_at: new Date().toISOString(),
     })
   }
@@ -102,4 +115,13 @@ export default class CheckRun {
       return `${annotationCount} issues found`
     }
   }
+}
+
+function chunk<T>(array: T[], chunkSize: number): Array<Array<T>> {
+  if (array.length == 0) {
+    return []
+  }
+  const head = array.slice(0, chunkSize)
+  const tail = array.slice(chunkSize)
+  return [head].concat(chunk(tail, chunkSize))
 }
