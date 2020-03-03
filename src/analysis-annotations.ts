@@ -39,14 +39,14 @@ function annotationForMessage(
     endColumn,
   ] = message.data.properties.range
   const ending = new RegExp(
-    `\\.? [Aa]t \\(\\(${startLine},${startColumn}\\),\\(${endLine},${endColumn}\\)\\)$`,
+    `\\.?( [Aa]t)? \\(\\(${startLine},${startColumn}\\),\\(${endLine},${endColumn}\\)\\)$`,
   )
   const description = message.data.description.replace(ending, '.')
 
   return {
     annotation_level: 'warning',
     message: description,
-    raw_details: message.data.description,
+    raw_details: JSON.stringify(message),
     path: path.join(elmRootDirectory, message.file),
     ...rangeForMessage(message),
   }

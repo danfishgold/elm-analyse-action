@@ -22,10 +22,14 @@ async function run() {
       headSha,
       elmRootDirectory,
     )
+    core.info(headSha)
     try {
       const report = await analyse(workspaceDirectory, elmRootDirectory)
       const annotations = analysisAnnotations(report, elmRootDirectory)
       await checkRun.finish(annotations)
+      if (annotations.length > 0) {
+        core.setFailed('elm-analyse found issues in your codebase.')
+      }
     } catch (error) {
       await checkRun.fail()
       throw error
