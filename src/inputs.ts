@@ -31,7 +31,7 @@ export default function actionInputs(env: NodeJS.ProcessEnv): Inputs {
   return {
     workspaceDirectory: GITHUB_WORKSPACE,
     elmRootDirectory: INPUT_ELM_ROOT_DIRECTORY,
-    headSha: GITHUB_SHA,
+    headSha: event.pull_request.head.sha,
     repoOwner: event.repository.owner.login,
     repoName: event.repository.name,
     github,

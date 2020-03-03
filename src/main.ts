@@ -22,7 +22,7 @@ async function run() {
       headSha,
       elmRootDirectory,
     )
-    core.info(headSha)
+    core.warning(headSha)
     try {
       const report = await analyse(workspaceDirectory, elmRootDirectory)
       const annotations = analysisAnnotations(report, elmRootDirectory)
